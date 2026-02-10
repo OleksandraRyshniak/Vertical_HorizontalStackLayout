@@ -5,6 +5,7 @@ public partial class TextPage : ContentPage
 	Label lbl;
 	Editor editor;
 	HorizontalStackLayout hsl;
+	VerticalStackLayout vsl;
 	List<string> nupud = new List<string>() { "Tagasi", "Avaleht", "Edasi" };
 	public TextPage(int i)
 	{
@@ -24,6 +25,10 @@ public partial class TextPage : ContentPage
 			FontSize = 17,
             HorizontalOptions = LayoutOptions.Center,
             FontAttributes  = FontAttributes.Italic
+		};
+		editor.TextChanged += (sender, e) =>
+		{
+			lbl.Text = editor.Text;
 		};
 
 		hsl = new HorizontalStackLayout
@@ -47,11 +52,30 @@ public partial class TextPage : ContentPage
 			hsl.Add(nupp);
             nupp.Clicked += Liikumine;
 		}
+		vsl = new VerticalStackLayout
+		{
+			Padding = 20,
+			Spacing = 15,
+			HorizontalOptions = LayoutOptions.Center,
+			Children = { lbl, editor, vsl }
+		};
 
 	}
 
     private void Liikumine(object? sender, EventArgs e)
     {
-        throw new NotImplementedException();
+		Button nupp = sender as Button;
+		if (nupp.ZIndex == 0)
+		{
+			Navigation.PopAsync();
+		}
+		else if (nupp.ZIndex == 1)
+		{
+			Navigation.PopToRootAsync();
+		}
+		else if (nupp.ZIndex == 2)
+		{
+			Navigation.PushAsync(new FigurePage());
+		}
     }
 }
