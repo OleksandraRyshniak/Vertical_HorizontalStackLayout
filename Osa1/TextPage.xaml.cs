@@ -1,3 +1,5 @@
+using TextToSpeech = Microsoft.Maui.Media.TextToSpeech;
+
 namespace Osa1;
 
 public partial class TextPage : ContentPage
@@ -40,7 +42,7 @@ public partial class TextPage : ContentPage
 		{
 			Button nupp = new Button
 			{
-				Text = nupud[i],
+				Text = nupud[j],
 				FontSize = 18,
 				FontFamily = "Impact",
 				TextColor = Colors.Black,
@@ -52,14 +54,27 @@ public partial class TextPage : ContentPage
 			hsl.Add(nupp);
             nupp.Clicked += Liikumine;
 		}
-		vsl = new VerticalStackLayout
+		Button btn = new Button
+		{
+			Text = "Muusika",
+			FontSize = 18,
+			FontFamily = "Impact",
+			TextColor = Colors.Black,
+			BackgroundColor = Colors.LightBlue,
+			CornerRadius = 10,
+			HeightRequest = 40
+
+		};
+		btn.Clicked += Btn_Clicked;
+
+        vsl = new VerticalStackLayout
 		{
 			Padding = 20,
 			Spacing = 15,
 			HorizontalOptions = LayoutOptions.Center,
-			Children = { lbl, editor, vsl }
+			Children = { lbl, editor, hsl, btn }
 		};
-
+		Content = vsl;
 	}
 
     private void Liikumine(object? sender, EventArgs e)
@@ -78,4 +93,29 @@ public partial class TextPage : ContentPage
 			Navigation.PushAsync(new FigurePage());
 		}
     }
+	
+	private async void Btn_Clicked (object ? sender, EventArgs e)
+	{
+		IEnumerable<Locale> locales = await TextToSpeech.Default.GetLocalesAsync();
+		SpeechOptions options = new SpeechOptions()
+		{
+			Pitch = 1.5f,
+			Volume = 0.75f,
+			Locale = locales.FirstOrDefault()
+		};
+		var text = editor.Text;
+		if (string.IsNullOrWhiteSpace(text))
+		{
+			await DisplayAlert("Viga", "Palun sisesta tekst", "OK");
+			return;
+		}
+		try
+		{
+			await TextToSpeech.SpeakAsync(text, options);
+		}
+		catch (Exception ex)
+		{
+			await DisplayAlert("TTS viga", ex.Message, "OK");
+		}
+	}
 }
